@@ -1,37 +1,51 @@
 ####
 # Each team's file must define four tokens:
-#     team_name: a string
-#     strategy_name: a string
-#     strategy_description: a string
+#     team_name: SatanShoes
+#     strategy_name: Winning
+#     strategy_description: Probability that the next outcome will be good.
 #     move: A function that returns 'c' or 'b'
 ####
 
 team_name = 'SatanShoes' # Only 10 chars displayed.
-strategy_name = 'WhiteOps'
-strategy_description = 'How does this strategy decide?'
+strategy_name = 'Winning'
+strategy_description = 'Repeats the outcome if good'
     
+###########
+
 def move(my_history, their_history, my_score, their_score):
     ''' Arguments accepted: my_history, their_history are strings.
     my_score, their_score are ints.
     
     Make my move.
-    Returns 'c' or 'b'. 
-    '''
-
+    Returns 'c' or 'b'. '''
+    if len(their_history) > 0:
+        percent_betray=float(their_history.count('b'))/float(len(their_history))*100 #This gives the probability of the opponent returning 'b'
+    
+    if len(their_history) > 0: #This block of code repeats positive outcomes
+        if 'b' in my_history[-1] and 'c' in their_history[-1]: 
+            return 'b'
+        elif 'c' in my_history[-1] and 'c' in their_history[-1]: #We want to collude with the opponent as much as possible
+            return 'c'
+        elif 'b' in my_history[-1] and 'b' in their_history[-1]: #If they will not collude with us at all we have to minimize losses and just betray
+            return 'b'
+    
+        else: #if none are positive
+            if percent_betray > 70: #Betray if the opponents chance to bretray is greater than 70%
+                return'b'
+            else:
+                if len(their_history) % 2 == 0: #Betray on even rounds
+                    return 'b'
+                else:
+                    return 'c'             
+    else:
+        return 'c'
     # my_history: a string with one letter (c or b) per round that has been played with this opponent.
     # their_history: a string of the same length as history, possibly empty. 
     # The first round between these two players is my_history[0] and their_history[0].
     # The most recent round is my_history[-1] and their_history[-1].
     
     # Analyze my_history and their_history and/or my_score and their_score.
-    # Decide whether to return 'c' or 'b'.
-    
-    if 'b' in their_history:
-        return 'b'
-    else:
-        return 'c'
-
-    
+    # Decide whether to return 'c' or 'b'. 
 def test_move(my_history, their_history, my_score, their_score, result):
     '''calls move(my_history, their_history, my_score, their_score)
     from this module. Prints error if return value != result.
@@ -55,7 +69,7 @@ if __name__ == '__main__':
               their_history='', 
               my_score=0,
               their_score=0,
-              result='b'):
+              result='c'):
          print 'Test passed'
      # Test 2: Continue betraying if they collude despite being betrayed.
     test_move(my_history='bbb',
